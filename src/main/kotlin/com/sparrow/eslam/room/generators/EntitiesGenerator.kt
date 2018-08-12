@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
+import com.sparrow.eslam.room.RoomGeneratorWindow
 import com.sparrow.eslam.room.cache.provideTablesFile
 import com.sparrow.eslam.room.entities.Table
 import java.io.File
@@ -11,7 +12,7 @@ import java.io.File
 
 const val newLineParam = "\n"
 
-fun generateEntities(project: Project, selectedPath: String) {
+fun generateEntities(selectedPath: String) {
     val packageName = providePackageName(selectedPath)
     val entitiesFile = provideTablesFile()
     println(entitiesFile.readText())
@@ -47,7 +48,7 @@ fun generateEntities(project: Project, selectedPath: String) {
             append(newLineParam)
         }
     }.run {
-        createFileFromString(selectedPath, this.toString(), project)
+        createFileFromString(selectedPath, this.toString(), RoomGeneratorWindow.instanse.project)
 
     }
 
