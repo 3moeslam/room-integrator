@@ -82,13 +82,17 @@ class GeneratePanel{
     fun selectPackage() {
         val returnVal = fileChooser.showSaveDialog(RoomGeneratorWindow.instanse.toolWindow.component)
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            val selectedFolder = fileChooser.selectedFile
-            cacheFile.write(selectedFolder.absolutePath)
-            println(selectedFolder!!.name)
-            JavaPsiFacade.getInstance(RoomGeneratorWindow.instanse.project).findPackage(selectedFolder.name)
-            providePackageName(selectedFolder.path)
-            generateEntities(RoomGeneratorWindow.instanse.project, selectedFolder.path)
-            generateDatabase(selectedFolder.path,DatabaseCacheFile().database,TableCacheFile().tables)
+            generateClasses()
         }
+    }
+
+    fun generateClasses() {
+        val selectedFolder = fileChooser.selectedFile
+        cacheFile.write(selectedFolder.absolutePath)
+        println(selectedFolder!!.name)
+        JavaPsiFacade.getInstance(RoomGeneratorWindow.instanse.project).findPackage(selectedFolder.name)
+        providePackageName(selectedFolder.path)
+        generateEntities(RoomGeneratorWindow.instanse.project, selectedFolder.path)
+        generateDatabase(selectedFolder.path, DatabaseCacheFile().database, TableCacheFile().tables)
     }
 }
