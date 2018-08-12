@@ -1,9 +1,11 @@
 package com.sparrow.eslam.room.panels
 
 import com.sparrow.eslam.room.RoomGeneratorWindow
-import com.sparrow.eslam.room.cache.CacheFile
 import com.sparrow.eslam.room.cache.DatabaseCacheFile
-import com.sparrow.eslam.room.cache.TableCacheFile
+import com.sparrow.eslam.room.cache.provideCacheFile
+import com.sparrow.eslam.room.cache.provideTablesFile
+import com.sparrow.eslam.room.cache.readItems
+import com.sparrow.eslam.room.entities.Table
 import com.sparrow.eslam.room.generators.generateDatabase
 import com.sparrow.eslam.room.generators.generateEntities
 import java.awt.GridBagConstraints
@@ -19,32 +21,27 @@ class GeneratePanel {
     private lateinit var selectPackageBtn: JButton
     private lateinit var daoPanel: JPanel
     private lateinit var addDao: JButton
-    private lateinit var fileChooser: JFileChooser
-    private var gridBagConstraints = GridBagConstraints()
     lateinit var main: JPanel
 
+    private var gridBagConstraints = GridBagConstraints()
     private var numOfDao = 0
-    private val cacheFile = CacheFile()
+    private val fileChooser by lazy { initializeFileChooser() }
+    private val cacheFile by lazy { provideCacheFile() }
+    private val tables by lazy {provideTablesFile().readItems<Table>()}
 
     init {
-        initializeFileChooser()
         selectPackageBtn.addActionListener { selectPackageFolder()?.run(::generateClasses) }
         addDao.addActionListener { addDao() }
         daoPanel.layout = GridBagLayout()
-        initilizeBagConstraints()
-        fileChooser = initializeFileChooser()
+        initializeBagConstraints()
         //initializeDaos()
     }
 
     private fun initializeDaos() {
-        val tables = TableCacheFile().tables
-
-        for (table in tables) {
-            addDao()
-        }
+        tables.forEach { addDao() }
     }
 
-    private fun initilizeBagConstraints() = with(gridBagConstraints) {
+    private fun initializeBagConstraints() = with(gridBagConstraints) {
         gridx = 0
         gridy = 0
         weightx = 1.0
@@ -84,10 +81,8 @@ class GeneratePanel {
 
 
     private fun generateClasses(selectedFolder: File) = selectedFolder
-            .apply { cacheFile.write(absolutePath) }
+            .apply { cacheFile.writeText(absolutePath) }
             .path
             .apply(::generateEntities)
-            .apply { generateDatabase(this, DatabaseCacheFile().database, TableCacheFile().tables) }
-
-
+            .apply { generateDatabase(this, DatabaseCacheFile().database, tables) }
 }

@@ -1,7 +1,10 @@
 package com.sparrow.eslam.room.panels
 
 import com.sparrow.eslam.room.TableCutomizeDialog
-import com.sparrow.eslam.room.cache.TableCacheFile
+import com.sparrow.eslam.room.cache.appendItem
+import com.sparrow.eslam.room.cache.provideTablesFile
+import com.sparrow.eslam.room.cache.readItems
+import com.sparrow.eslam.room.cache.writeItems
 import com.sparrow.eslam.room.entities.Table
 import com.sparrow.eslam.room.views.provideButton
 import com.sparrow.eslam.room.views.provideConstrains
@@ -21,15 +24,15 @@ class TablesPanel{
     private var gridBagConstraints = GridBagConstraints()
     private var numOfTables = 0
 
-    val tablesFile = TableCacheFile()
-    val tables :MutableList<Table> = tablesFile.tables
+    val tablesFile = provideTablesFile()
+    val tables = tablesFile.readItems<Table>()
 
     init {
         addView.addActionListener { addNewTableAction()  }
         mainTablesPanel.layout = GridBagLayout()
         initilizeBagConstraints()
 
-        tablesFile.tables.forEach(::addTableToPanel)
+        tables.forEach(::addTableToPanel)
     }
 
     fun getPanel():JPanel?{
@@ -41,7 +44,7 @@ class TablesPanel{
     }
 
     private fun addNewTable(table: Table){
-        tablesFile.add(table)
+        tablesFile.appendItem(table)
         addTableToPanel(table)
     }
 
@@ -77,7 +80,7 @@ class TablesPanel{
         //TODO ask first
         mainTablesPanel.remove(tables.indexOf(table))
         tables.remove(table)
-        tablesFile.write(tables)
+        tablesFile.writeItems(tables)
         mainTablesPanel.updateUI()
     }
 
