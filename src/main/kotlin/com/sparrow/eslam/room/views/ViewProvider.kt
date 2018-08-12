@@ -1,11 +1,11 @@
-package main.views
+package com.sparrow.eslam.room.views
 
 import java.awt.Color
 import java.awt.GridBagConstraints
 import java.awt.GridLayout
-import javax.swing.*
 import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
+import javax.swing.*
 import javax.swing.event.ChangeEvent
 
 
@@ -19,6 +19,10 @@ fun provideJLabel(labelText: String): JLabel {
 fun provideButton(buttonText: String): JButton {
     return JButton().apply {
         text = buttonText
+//        addActionListener{
+//            if(table.tableName.isNotEmpty())
+//                TableCutomizeDialog().show()
+//        }
     }
 }
 
@@ -37,10 +41,14 @@ fun provideConstrains(): GridBagConstraints {
     }
 }
 
-fun provideTextField(placeHolder: String = ""): JTextField {
+fun provideTextField(placeHolder: String = "",txt:String=""): JTextField {
     return JTextField().apply {
-        foreground = Color.GRAY
-        text = placeHolder
+
+        if(txt.isEmpty())
+            foreground = Color.GRAY
+
+        text = if(txt.isEmpty()) placeHolder else txt
+
         addFocusListener(object : FocusListener {
             override fun focusGained(e: FocusEvent) {
                 if (text == placeHolder) {

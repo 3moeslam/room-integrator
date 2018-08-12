@@ -1,14 +1,18 @@
-package main.views
+package com.sparrow.eslam.room.views
 
-import main.entities.Field
-import main.entities.Table
+import com.sparrow.eslam.room.entities.Field
 import java.awt.GridLayout
 import java.awt.event.ItemEvent
+import javax.swing.JCheckBox
 import javax.swing.JPanel
+import javax.swing.JTextField
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 
-class NewFieldPanel : JPanel() {
+class NewFieldPanel constructor(val fileldName: String = ""
+                                , val filedType: String = ""
+                                , val isPrimary: Boolean = false
+                                , val isIgnore: Boolean = false) : JPanel() {
 
     val field = Field()
 
@@ -20,11 +24,15 @@ class NewFieldPanel : JPanel() {
 
     private fun provideFieldView(): JPanel {
         val panel = providePanel(4)
-        val fieldNameText = provideTextField("Field Name")
-        val fieldTypeText = provideTextField("Field Type")
+        val fieldNameText = provideTextField("Field Name", fileldName)
+        val fieldTypeText = provideTextField("Field Type", filedType)
         val primaryKeyCheck = proivdeCheckBox("Primary Key")
         val ignoreCheck = proivdeCheckBox("Ignore")
         val constraints = provideConstrains()
+
+
+        initializeFromConstructor(fieldNameText, fieldTypeText, primaryKeyCheck, ignoreCheck)
+
 
         fieldNameText.document.addDocumentListener(provideTextChangListner {
             println(fieldNameText.text)
@@ -52,6 +60,16 @@ class NewFieldPanel : JPanel() {
         constraints.gridy = 3
         panel.add(ignoreCheck, constraints)
         return panel
+    }
+
+    fun initializeFromConstructor(fieldNameText: JTextField, fieldTypeText: JTextField, primaryKeyCheck: JCheckBox, ignoreCheck: JCheckBox) {
+        if (fileldName.isNotEmpty())
+            fieldNameText.text = fileldName
+        if (filedType.isNotEmpty())
+            fieldTypeText.text = filedType
+
+        primaryKeyCheck.isSelected = isPrimary
+        ignoreCheck.isSelected = isIgnore
     }
 
 
