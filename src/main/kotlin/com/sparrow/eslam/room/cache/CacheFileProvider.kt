@@ -32,8 +32,8 @@ fun provideCacheFile(): File {
 fun provideTablesFile():File{
     val baseFilesPath = RoomGeneratorWindow.projectPath + File.separatorChar + "app" + File.separatorChar + "build" + File.separatorChar + "room-generator"
     val tablesFile = File(baseFilesPath+File.separatorChar+"tables")
-    if(tablesFile.parentFile.mkdirs()){
-        //TODO Create tables initializer method
-    }
+    tablesFile.parentFile.mkdirs()
+    if(!tablesFile.exists())
+        tablesFile.createNewFile()
     return tablesFile
 }

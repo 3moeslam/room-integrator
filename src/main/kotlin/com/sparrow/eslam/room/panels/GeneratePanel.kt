@@ -1,13 +1,11 @@
 package com.sparrow.eslam.room.panels
 
-import com.intellij.psi.JavaPsiFacade
 import com.sparrow.eslam.room.RoomGeneratorWindow
 import com.sparrow.eslam.room.cache.CacheFile
 import com.sparrow.eslam.room.cache.DatabaseCacheFile
 import com.sparrow.eslam.room.cache.TableCacheFile
 import com.sparrow.eslam.room.generators.generateDatabase
 import com.sparrow.eslam.room.generators.generateEntities
-import com.sparrow.eslam.room.generators.providePackageName
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.io.File
@@ -21,11 +19,11 @@ class GeneratePanel {
     private lateinit var selectPackageBtn: JButton
     private lateinit var daoPanel: JPanel
     private lateinit var addDao: JButton
-    private lateinit var main: JPanel
+    private lateinit var fileChooser: JFileChooser
+    private var gridBagConstraints = GridBagConstraints()
+    lateinit var main: JPanel
 
     private var numOfDao = 0
-    private var gridBagConstraints = GridBagConstraints()
-    private lateinit var fileChooser: JFileChooser
     private val cacheFile = CacheFile()
 
     init {
@@ -34,7 +32,7 @@ class GeneratePanel {
         addDao.addActionListener { addDao() }
         daoPanel.layout = GridBagLayout()
         initilizeBagConstraints()
-
+        fileChooser = initializeFileChooser()
         //initializeDaos()
     }
 
@@ -46,53 +44,50 @@ class GeneratePanel {
         }
     }
 
-    private fun initilizeBagConstraints() {
-        gridBagConstraints.gridx = 0
-        gridBagConstraints.gridy = 0
-        gridBagConstraints.weightx = 1.0
-        gridBagConstraints.weighty = 1.0
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL
-        gridBagConstraints.anchor = GridBagConstraints.NORTH
-        gridBagConstraints.gridheight = 1
-        gridBagConstraints.gridwidth = 1
+    private fun initilizeBagConstraints() = with(gridBagConstraints) {
+        gridx = 0
+        gridy = 0
+        weightx = 1.0
+        weighty = 1.0
+        fill = GridBagConstraints.HORIZONTAL
+        anchor = GridBagConstraints.NORTH
+        gridheight = 1
+        gridwidth = 1
     }
 
-    private fun addDao() {
-        val daoRow = DaoRow().getPanel()
-        daoRow.border = BorderFactory.createRaisedBevelBorder()
-
+    private fun addDao() = with(DaoRow().getPanel()) {
+        border = BorderFactory.createRaisedBevelBorder()
         gridBagConstraints.gridy = numOfDao++
-        daoPanel.add(daoRow, gridBagConstraints)
+        daoPanel.add(this, gridBagConstraints)
         daoPanel.updateUI()
     }
 
-    private fun initializeFileChooser() {
-        fileChooser = JFileChooser()
-        fileChooser.fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
-        fileChooser.currentDirectory = if (cacheFile.path.isNotEmpty()) File(cacheFile.path) else File(RoomGeneratorWindow.projectPath)
-        fileChooser.dialogTitle = "Select room package"
+
+    private fun initializeFileChooser() = JFileChooser().apply {
+        fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
+        currentDirectory = selectedDirectory()
+        dialogTitle = "Select room package"
     }
 
-
-    fun getPanel(): JPanel? {
-        return main
-    }
-
-    private fun selectPackageFolder() =
-            RoomGeneratorWindow.instanse
-                    .toolWindow
-                    .component
-                    .run(fileChooser::showSaveDialog)
-                    .takeIf { it == JFileChooser.APPROVE_OPTION }
-                    ?.let { fileChooser.selectedFile }
+    private fun selectedDirectory() = cacheFile.path
+            .takeIf { it.isNotEmpty() }
+            ?.run(::File)
+            ?: File(RoomGeneratorWindow.projectPath)
 
 
-    private fun generateClasses(selectedFolder: File) {
-        selectedFolder.apply { cacheFile.write(absolutePath) }
-                .path
-                .apply(::generateEntities)
-                .apply { generateDatabase(this, DatabaseCacheFile().database, TableCacheFile().tables) }
+    private fun selectPackageFolder() = RoomGeneratorWindow.instanse
+            .toolWindow
+            .component
+            .run(fileChooser::showSaveDialog)
+            .takeIf { it == JFileChooser.APPROVE_OPTION }
+            ?.let { fileChooser.selectedFile }
 
 
-    }
+    private fun generateClasses(selectedFolder: File) = selectedFolder
+            .apply { cacheFile.write(absolutePath) }
+            .path
+            .apply(::generateEntities)
+            .apply { generateDatabase(this, DatabaseCacheFile().database, TableCacheFile().tables) }
+
+
 }

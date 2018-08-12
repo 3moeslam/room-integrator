@@ -3,20 +3,25 @@ package com.sparrow.eslam.room.cache
 import com.google.gson.Gson
 import com.sparrow.eslam.room.entities.Table
 
-class TableCacheFile{
+class TableCacheFile {
 
-    val file = provideTablesFile()
+    private val file by lazy {  provideTablesFile()}
 
-    val tables : MutableList<Table> get() {
-        return  Gson().fromJson(file.readText(), Array<Table>::class.java).toMutableList()
+    val tables by lazy {
+        file.readText()
+                .takeIf { it.isNotEmpty() }
+                ?.run { Gson().fromJson(this, Array<Table>::class.java) }
+                ?.toMutableList()
+                ?: mutableListOf()
     }
-    fun add(table: Table){
+
+    fun add(table: Table) {
         val cachedList = Gson().fromJson(file.readText(), ArrayList<Table>().javaClass)
         cachedList.add(table)
         file.writeText(Gson().toJson(cachedList))
     }
 
-    fun write(tables :List<Table>){
+    fun write(tables: List<Table>) {
         file.writeText(Gson().toJson(tables))
     }
 

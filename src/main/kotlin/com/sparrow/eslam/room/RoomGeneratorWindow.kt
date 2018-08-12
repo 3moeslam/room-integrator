@@ -39,7 +39,7 @@ class RoomGeneratorWindow : ToolWindowFactory {
         fieldsPane.apply {
             this!!.addTab("Database", DatabasePanel().getPanel())
             addTab("Tables", TablesPanel().getPanel())
-            addTab("Generate", GeneratePanel().getPanel())
+            addTab("Generate", GeneratePanel().main)
         }
         val contentFactory = ContentFactory.SERVICE.getInstance()
         val content = contentFactory.createContent(mainPanel, "", false)
